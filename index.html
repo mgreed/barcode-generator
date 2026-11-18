@@ -18,7 +18,7 @@
 </head>
 <body>
 <h1>Code 128 Barcode Generator</h1>
-<p>Enter a 4-digit number.</p>
+<p>Enter a number up to 4 digits (shorter numbers are padded with zeros).</p>
 <input id="num" inputmode="numeric" maxlength="4" placeholder="0000" autofocus>
 <div class="err" id="err"></div>
 <div id="out"><svg id="bc"></svg></div>
@@ -32,10 +32,10 @@ const inp=document.getElementById('num'),err=document.getElementById('err'),svg=
   png=document.getElementById('png'),prt=document.getElementById('print');
 function render(){
   inp.value=inp.value.replace(/\D/g,'').slice(0,4);
-  const v=inp.value;
-  const ok=/^\d{4}$/.test(v);
+  const v=inp.value.padStart(4,'0');
+  const ok=inp.value.length>0;
   png.disabled=prt.disabled=!ok;
-  if(!ok){svg.innerHTML='';svg.removeAttribute('width');svg.removeAttribute('height');err.textContent=v.length?'Please enter exactly 4 digits.':'';return;}
+  if(!ok){svg.innerHTML='';svg.removeAttribute('width');svg.removeAttribute('height');err.textContent='';return;}
   err.textContent='';
   JsBarcode(svg,v,{format:'CODE128',width:3,height:100,fontSize:22,margin:12});
 }
@@ -45,7 +45,7 @@ png.onclick=()=>{
   const img=new Image(),s=3;
   img.onload=()=>{const c=document.createElement('canvas');c.width=img.width*s;c.height=img.height*s;
     const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
-    const a=document.createElement('a');a.download='barcode-'+inp.value+'.png';a.href=c.toDataURL('image/png');a.click();};
+    const a=document.createElement('a');a.download='barcode-'+inp.value.padStart(4,'0')+'.png';a.href=c.toDataURL('image/png');a.click();};
   img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(xml);
 };
 prt.onclick=()=>{const w=window.open('');w.document.write('<html><body style="margin:0;text-align:center">'+svg.outerHTML+'</body></html>');w.document.close();w.focus();w.print();};
